@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f6fb">
+  <title>PeopleOS | HRMS</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #20213a;
+      --muted: #898ba0;
+      --purple: #6558d9;
+      --purple-soft: #f0efff;
+      --line: #eeedf4;
+      --surface: #fff;
+      --green: #239b72;
+      --red: #d35b68;
+      --amber: #d99132;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    [hidden] { display: none !important; }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: var(--ink); background: #f6f7fb; }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    .app { min-height: 100vh; display: grid; grid-template-columns: 246px minmax(0, 1fr); }
+    .sidebar { background: #fff; border-right: 1px solid var(--line); padding: 27px 17px; display: flex; flex-direction: column; }
+    .brand { display: flex; align-items: center; gap: 11px; padding: 0 12px 35px; font-weight: 800; font-size: 20px; letter-spacing: -.7px; }
+    .brand-mark { background: var(--purple); color: white; width: 36px; height: 36px; border-radius: 12px; display: grid; place-items: center; font-size: 17px; }
+    .brand span:last-child { color: var(--purple); }
+    .nav-label { color: #aaabba; text-transform: uppercase; font-size: 10px; letter-spacing: 1.5px; font-weight: 700; padding: 0 13px 11px; }
+    .nav { display: grid; gap: 5px; }
+    .nav button { border: 0; background: transparent; color: #77798e; text-align: left; padding: 12px 13px; border-radius: 10px; font-size: 13px; font-weight: 600; }
+    .nav button:hover, .nav button.active { background: var(--purple-soft); color: var(--purple); }
+    .nav-icon { display: inline-block; width: 27px; font-size: 16px; vertical-align: -1px; }
+    .sidebar-bottom { margin-top: auto; border-top: 1px solid var(--line); padding: 17px 8px 0; }
+    .user { display: flex; align-items: center; gap: 10px; }
+    .avatar { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; color: #6355ce; background: #eeecff; font-size: 12px; font-weight: 800; }
+    .user-name { font-size: 12px; font-weight: 700; }
+    .user-role { margin-top: 3px; color: var(--muted); font-size: 11px; }
+    .logout { margin-left: auto; border: 0; background: none; color: #8b8ca0; padding: 8px; }
+    .main { min-width: 0; padding: 27px clamp(18px, 4vw, 48px) 45px; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-bottom: 26px; }
+    .crumb { color: #999aab; font-size: 12px; }
+    .crumb strong { color: var(--ink); font-weight: 650; }
+    .top-actions { display: flex; align-items: center; gap: 10px; }
+    .date-pill { background: white; border: 1px solid var(--line); border-radius: 9px; padding: 9px 12px; color: #686a80; font-size: 12px; }
+    .primary { color: #fff; background: var(--purple); border: 0; border-radius: 9px; padding: 10px 14px; font-size: 12px; font-weight: 700; box-shadow: 0 5px 14px #6558d925; }
+    .primary:hover { background: #574ac7; }
+    h1 { margin: 0; font-size: clamp(23px, 3vw, 29px); letter-spacing: -1px; }
+    .subtitle { color: var(--muted); font-size: 13px; margin: 8px 0 22px; }
+    .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 15px; margin-bottom: 18px; }
+    .card { background: var(--surface); border: 1px solid #efeff5; border-radius: 14px; box-shadow: 0 4px 14px #28234206; }
+    .stat { padding: 18px 18px 16px; }
+    .stat-head { display: flex; justify-content: space-between; align-items: center; color: #77798f; font-size: 11px; font-weight: 650; }
+    .stat-icon { height: 32px; width: 32px; display: grid; place-items: center; border-radius: 10px; background: var(--purple-soft); color: var(--purple); font-size: 15px; }
+    .stat-value { font-size: 29px; font-weight: 760; letter-spacing: -1px; margin-top: 10px; }
+    .stat-note { font-size: 11px; color: #a0a1b1; margin-top: 4px; }
+    .grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(270px, .9fr); gap: 16px; align-items: start; }
+    .panel { padding: 19px; }
+    .panel-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px; }
+    .panel-title { font-size: 14px; font-weight: 750; }
+    .panel-note { margin-top: 5px; color: var(--muted); font-size: 11px; }
+    .text-button { color: var(--purple); background: none; border: 0; font-size: 11px; font-weight: 700; }
+    .chart { height: 171px; display: flex; align-items: end; gap: 14px; padding: 12px 7px 0; border-bottom: 1px solid var(--line); }
+    .bar-group { flex: 1; min-width: 28px; display: flex; flex-direction: column; justify-content: end; align-items: center; height: 100%; gap: 8px; }
+    .bar { width: min(35px, 80%); min-height: 4px; background: linear-gradient(180deg, #887df0, #6558d9); border-radius: 7px 7px 2px 2px; transition: height .35s ease; }
+    .bar-label { color: #9697a8; font-size: 10px; padding-bottom: 9px; }
+    .chart-legend { display: flex; gap: 15px; margin-top: 13px; color: #88899c; font-size: 10px; }
+    .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--purple); margin-right: 5px; }
+    .dot.absent { background: #f0b258; }
+    .dot.leave { background: #72c5a5; }
+    .activity-list { display: grid; gap: 15px; }
+    .activity { display: flex; gap: 11px; align-items: center; }
+    .activity-mark { width: 34px; height: 34px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 11px; color: #6659d3; background: #f1efff; font-size: 13px; font-weight: 700; }
+    .activity-main { min-width: 0; flex: 1; }
+    .activity-name { font-size: 11px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .activity-detail { font-size: 10px; color: var(--muted); margin-top: 4px; }
+    .badge { border-radius: 20px; padding: 5px 8px; font-size: 9px; font-weight: 750; white-space: nowrap; }
+    .badge.PENDING { color: #a96b17; background: #fff5e3; }
+    .badge.APPROVED, .badge.PRESENT { color: #16805b; background: #e6f7ef; }
+    .badge.REJECTED, .badge.ABSENT { color: #bb4856; background: #fff0f1; }
+    .badge.ON_LEAVE { color: #6253c8; background: #f0eeff; }
+    .section { display: none; }
+    .section.active { display: block; }
+    .toolbar { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+    .search { width: min(290px, 100%); border: 1px solid var(--line); background: #fff; padding: 10px 12px; border-radius: 9px; outline: none; font-size: 12px; }
+    .search:focus, input:focus, select:focus { border-color: #9389ef; box-shadow: 0 0 0 3px #6558d91c; outline: none; }
+    .table-wrap { overflow-x: auto; }
+    table { border-collapse: collapse; width: 100%; min-width: 570px; text-align: left; }
+    th { color: #9999aa; text-transform: uppercase; font-size: 9px; letter-spacing: .8px; font-weight: 700; padding: 11px 10px; border-bottom: 1px solid var(--line); }
+    td { padding: 12px 10px; border-bottom: 1px solid #f1f0f5; font-size: 11px; color: #55576d; }
+    tr:last-child td { border-bottom: 0; }
+    .person { display: flex; align-items: center; gap: 9px; color: var(--ink); font-weight: 650; }
+    .mini-avatar { width: 29px; height: 29px; background: #f0efff; color: #6457d2; border-radius: 9px; display: grid; place-items: center; font-size: 10px; font-weight: 800; }
+    .row-actions { display: flex; gap: 5px; }
+    .small-btn { border: 1px solid var(--line); color: #66677c; background: white; padding: 6px 8px; border-radius: 7px; font-size: 10px; }
+    .small-btn:hover { border-color: #c7c2fb; color: var(--purple); }
+    .small-btn.danger:hover { border-color: #f1b9c0; color: var(--red); }
+    .empty { padding: 35px 15px; text-align: center; color: var(--muted); font-size: 12px; }
+    .modal-backdrop { position: fixed; inset: 0; background: #1e1c3470; display: none; align-items: center; justify-content: center; padding: 20px; z-index: 3; }
+    .modal-backdrop.open { display: flex; }
+    .modal { width: min(455px, 100%); background: #fff; border-radius: 16px; padding: 23px; box-shadow: 0 20px 70px #17132a40; }
+    .modal h2 { font-size: 18px; margin: 0 0 5px; }
+    .modal .hint { color: var(--muted); font-size: 11px; margin: 0 0 18px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .field { display: grid; gap: 6px; margin-bottom: 12px; }
+    .field.full { grid-column: 1 / -1; }
+    .field label { color: #747589; font-size: 10px; font-weight: 700; }
+    .field input, .field select { width: 100%; border: 1px solid var(--line); background: #fff; border-radius: 8px; padding: 10px; font-size: 12px; color: var(--ink); }
+    .modal-actions { display: flex; justify-content: end; gap: 8px; margin-top: 15px; }
+    .secondary { border: 1px solid var(--line); background: white; color: #6e7083; padding: 9px 13px; border-radius: 8px; font-size: 11px; font-weight: 700; }
+    .toast { position: fixed; bottom: 22px; right: 22px; z-index: 5; background: #25243b; color: white; border-radius: 10px; padding: 12px 16px; font-size: 12px; opacity: 0; transform: translateY(10px); transition: .2s; pointer-events: none; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .login-screen { position: fixed; inset: 0; z-index: 8; background: #f6f7fb; display: none; align-items: center; justify-content: center; padding: 20px; }
+    .login-card { width: min(380px, 100%); padding: 30px; }
+    .login-card h1 { font-size: 25px; margin-top: 20px; }
+    .login-card p { color: var(--muted); font-size: 12px; line-height: 1.6; margin: 9px 0 23px; }
+    .login-card .primary { width: 100%; margin-top: 5px; padding: 12px; }
+    .error { color: var(--red); font-size: 11px; min-height: 16px; margin: 0 0 9px; }
+    .mobile-menu { display: none; border: 0; background: white; border-radius: 8px; padding: 8px 10px; }
+    @media (max-width: 970px) { .stats { grid-template-columns: repeat(2, 1fr); } .grid { grid-template-columns: 1fr; } }
+    @media (max-width: 680px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar { position: fixed; z-index: 4; inset: 0 auto 0 0; width: 246px; transform: translateX(-100%); transition: transform .2s; box-shadow: 12px 0 35px #201c3915; }
+      .sidebar.open { transform: translateX(0); }
+      .main { padding: 19px 16px 32px; }
+      .topbar { margin-bottom: 22px; }
+      .mobile-menu { display: inline-block; }
+      .date-pill { display: none; }
+      .stats { gap: 9px; }
+      .stat { padding: 13px; }
+      .stat-value { font-size: 25px; }
+      .top-actions { gap: 7px; }
+      .primary { padding: 9px 10px; }
+      .form-grid { grid-template-columns: 1fr; gap: 0; }
+    }
+    :root {
+      --ink: #1d2540;
+      --muted: #7c849d;
+      --purple: #7357e8;
+      --purple-soft: #f0edff;
+      --line: #e9ebf3;
+      --surface: #fff;
+      --green: #199b78;
+      --red: #d95d70;
+      --amber: #d99436;
+    }
+    body { background: #f5f6fb; }
+    .app { grid-template-columns: 258px minmax(0, 1fr); }
+    .sidebar {
+      position: sticky; top: 0; height: 100vh; overflow-y: auto;
+      background: #171b31; border-right: 0; padding: 28px 18px 20px; color: #f4f4ff;
+    }
+    .brand { padding: 0 10px 48px; color: #fff; font-size: 21px; }
+    .brand span:last-child { color: #c7baff; }
+    .brand-mark { background: linear-gradient(145deg, #a48bff, #7357e8); border-radius: 13px; box-shadow: 0 7px 18px #7357e855; }
+    .nav-label { color: #858ba8; padding-bottom: 13px; }
+    .nav { gap: 7px; }
+    .nav button { color: #aab0c9; padding: 13px 14px; transition: background .18s, color .18s, transform .18s; }
+    .nav button:hover { background: #ffffff0d; color: #fff; transform: translateX(2px); }
+    .nav button.active { color: #fff; background: linear-gradient(100deg, #7357e8, #6650d2); box-shadow: 0 8px 20px #5540c540; }
+    .nav-icon { width: 30px; }
+    .sidebar-bottom { border-color: #ffffff18; }
+    .avatar { color: #fff; background: linear-gradient(145deg, #9277f4, #6451d1); }
+    .user-name { color: #f6f5ff; }
+    .user-role, .logout { color: #aab0c9; }
+    .logout:hover { color: #fff; }
+    .main { padding: 28px clamp(20px, 4vw, 56px) 48px; }
+    .topbar { margin-bottom: 30px; }
+    .crumb { color: #9097ad; }
+    .crumb strong { color: #343b56; }
+    .date-pill { border-color: #e8eaf2; box-shadow: 0 4px 12px #252b4208; }
+    .primary { background: linear-gradient(110deg, #765ae9, #624bd0); border-radius: 10px; box-shadow: 0 7px 16px #7158df35; transition: transform .18s, box-shadow .18s; }
+    .primary:hover { background: linear-gradient(110deg, #684bdc, #5640c2); box-shadow: 0 9px 20px #7158df48; transform: translateY(-1px); }
+    #view-overview > h1 {
+      position: relative; overflow: hidden; color: white; font-size: clamp(25px, 3vw, 34px);
+      letter-spacing: -1.2px; padding: 31px 34px 0; margin: 0;
+      border-radius: 18px 18px 0 0;
+      background: radial-gradient(ellipse at 85% 5%, #ffffff30, transparent 32%), linear-gradient(115deg, #5947bf, #795fe8 62%, #987cf1);
+    }
+    #view-overview > h1::after {
+      content: ""; position: absolute; width: 190px; height: 190px; right: 7%; top: -112px;
+      border: 1px solid #ffffff28; border-radius: 50%; box-shadow: 0 0 0 22px #ffffff0b, 0 0 0 45px #ffffff08;
+    }
+    #view-overview > .subtitle {
+      color: #eeeaff; margin: 0 0 22px; padding: 8px 34px 30px;
+      border-radius: 0 0 18px 18px; background: linear-gradient(115deg, #5947bf, #795fe8 62%, #987cf1);
+    }
+    .subtitle { margin-bottom: 24px; }
+    .stats { gap: 17px; margin-bottom: 20px; }
+    .card { border: 1px solid #eaecf3; border-radius: 16px; box-shadow: 0 5px 18px #26305208; }
+    .stat { position: relative; overflow: hidden; padding: 20px; transition: transform .2s, box-shadow .2s; }
+    .stat:hover { transform: translateY(-3px); box-shadow: 0 14px 28px #26305212; }
+    .stat-head { color: #737c97; font-size: 12px; }
+    .stat-icon { border-radius: 11px; background: #f0edff; color: #7357e8; }
+    .stat-value { color: #202844; font-size: 32px; margin-top: 13px; }
+    .stat-note { color: #9098ac; font-size: 11px; }
+    .grid { gap: 18px; }
+    .panel { padding: 22px; }
+    .panel-head { margin-bottom: 19px; }
+    .panel-title { color: #28304b; font-size: 14px; }
+    .panel-note { color: #8c94a9; }
+    .text-button { color: #7055dd; }
+    .chart { height: 185px; gap: 18px; border-bottom-color: #edf0f5; }
+    .bar-group { gap: 10px; }
+    .bar { width: min(42px, 80%); background: linear-gradient(180deg, #a18df6, #7055df); border-radius: 9px 9px 3px 3px; box-shadow: 0 5px 12px #7158df25; }
+    .bar-label { color: #818aa2; font-size: 10px; }
+    .chart-legend { color: #7e879d; }
+    .activity-list { gap: 17px; }
+    .activity { gap: 12px; }
+    .activity-mark { border-radius: 12px; color: #6c52d5; background: #f0edff; }
+    .activity-name { color: #343c56; font-size: 12px; }
+    .activity-detail { color: #8991a7; }
+    .badge { padding: 6px 9px; font-size: 9px; letter-spacing: .2px; }
+    .section:not(#view-overview) > h1 { color: #202844; font-size: clamp(25px, 3vw, 31px); }
+    .toolbar { align-items: center; }
+    .search { border-color: #e7eaf2; border-radius: 10px; padding: 11px 13px; color: #38415d; }
+    .table-wrap { border-radius: 11px; }
+    #recent-employees { overflow-x: auto; }
+    table { min-width: 620px; }
+    th { color: #8c94a9; background: #fafbfe; font-size: 9px; padding: 13px 12px; }
+    td { color: #59627c; border-bottom-color: #eff1f6; font-size: 11px; padding: 14px 12px; }
+    tbody tr { transition: background .15s; }
+    tbody tr:hover { background: #faf9ff; }
+    .person { color: #28304b; }
+    .mini-avatar { background: #f0edff; color: #6d52d6; border-radius: 10px; }
+    .small-btn { border-color: #e7eaf2; border-radius: 8px; padding: 7px 9px; }
+    .empty { color: #838ca3; }
+    .modal-backdrop { background: #14172b99; backdrop-filter: blur(5px); }
+    .modal { border-radius: 19px; padding: 27px; }
+    .field input, .field select { border-color: #e5e8f0; border-radius: 9px; }
+    .toast { border-radius: 12px; box-shadow: 0 10px 30px #171b3140; }
+    .login-screen {
+      background: radial-gradient(ellipse at 14% 18%, #e9e4ff 0, transparent 35%),
+        radial-gradient(ellipse at 91% 84%, #e1f5ef 0, transparent 32%), #f7f8fc;
+    }
+    .login-card {
+      position: relative; z-index: 1; width: min(420px, 100%); padding: 36px;
+      border: 1px solid #ffffff; border-radius: 22px;
+      box-shadow: 0 24px 70px #32345a18, 0 3px 12px #32345a08;
+    }
+    .login-card .brand { padding-bottom: 0; }
+    .login-card h1 { color: #202844; font-size: 29px; margin-top: 27px; letter-spacing: -1px; }
+    .login-card p { color: #8089a0; font-size: 13px; }
+    .login-card .field { margin-bottom: 15px; }
+    .login-card .field label { color: #737d97; letter-spacing: .5px; }
+    .login-card .field input { padding: 12px 13px; border-color: #e4e7f0; border-radius: 10px; }
+    .login-card .primary { padding: 13px; font-size: 13px; margin-top: 7px; }
+    @media (max-width: 970px) {
+      .app { grid-template-columns: 235px minmax(0, 1fr); }
+      .sidebar { padding-left: 15px; padding-right: 15px; }
+    }
+    @media (max-width: 680px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar { position: fixed; height: 100vh; }
+      .main { padding: 18px 16px 30px; }
+      #view-overview > h1 { padding: 25px 22px 0; }
+      #view-overview > .subtitle { padding: 8px 22px 23px; }
+      .stats { gap: 10px; }
+      .stat { padding: 14px; }
+      .panel { padding: 17px; }
+      .toolbar { align-items: stretch; flex-wrap: wrap; }
+      .login-card { padding: 28px 24px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app" class="app" hidden>
+    <aside id="sidebar" class="sidebar">
+      <div class="brand"><span class="brand-mark">P</span><span>People<span>OS</span></span></div>
+      <div class="nav-label">Workspace</div>
+      <nav class="nav">
+        <button class="active" data-view="overview"><span class="nav-icon">◫</span>Overview</button>
+        <button data-view="employees"><span class="nav-icon">♙</span>Employees</button>
+        <button data-view="attendance"><span class="nav-icon">◷</span>Attendance</button>
+        <button data-view="leaves"><span class="nav-icon">▤</span>Leave requests</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="user"><div id="avatar" class="avatar">HR</div><div><div id="username" class="user-name">Administrator</div><div class="user-role">HR administrator</div></div><button class="logout" title="Sign out" onclick="logout()">↪</button></div>
+      </div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <div style="display:flex;align-items:center;gap:12px"><button class="mobile-menu" onclick="toggleMenu()">☰</button><div class="crumb">PeopleOS <span style="padding:0 7px">/</span> <strong id="breadcrumb">Overview</strong></div></div>
+        <div class="top-actions"><div id="date-pill" class="date-pill"></div><button id="top-add" class="primary" onclick="openEmployee()">＋ Add employee</button></div>
+      </header>
+      <section id="view-overview" class="section active">
+        <h1>Good day, <span id="welcome-name">there</span> 👋</h1>
+        <p class="subtitle">Here’s what’s happening across your organization today.</p>
+        <div class="stats">
+          <article class="card stat"><div class="stat-head">Total employees <span class="stat-icon">♙</span></div><div id="stat-employees" class="stat-value">0</div><div class="stat-note">People in your organization</div></article>
+          <article class="card stat"><div class="stat-head">Departments <span class="stat-icon" style="color:#278d73;background:#e9f7f1">▦</span></div><div id="stat-departments" class="stat-value">0</div><div class="stat-note">Distinct teams</div></article>
+          <article class="card stat"><div class="stat-head">Present today <span class="stat-icon" style="color:#278d73;background:#e9f7f1">✓</span></div><div id="stat-present" class="stat-value">0</div><div id="stat-present-note" class="stat-note">Attendance recorded</div></article>
+          <article class="card stat"><div class="stat-head">Pending leave <span class="stat-icon" style="color:#d08d30;background:#fff4e3">◷</span></div><div id="stat-pending" class="stat-value">0</div><div class="stat-note">Requests need your review</div></article>
+        </div>
+        <div class="grid">
+          <article class="card panel">
+            <div class="panel-head"><div><div class="panel-title">Attendance overview</div><div class="panel-note">Today's team attendance</div></div><button class="text-button" onclick="navigate('attendance')">View records →</button></div>
+            <div id="attendance-chart" class="chart"></div>
+            <div class="chart-legend"><span><i class="dot"></i>Present</span><span><i class="dot absent"></i>Absent</span><span><i class="dot leave"></i>On leave</span><span style="margin-left:auto" id="not-marked"></span></div>
+          </article>
+          <article class="card panel">
+            <div class="panel-head"><div><div class="panel-title">Leave requests</div><div class="panel-note">Requests waiting for a decision</div></div><button class="text-button" onclick="navigate('leaves')">See all →</button></div>
+            <div id="overview-leaves" class="activity-list"></div>
+          </article>
+        </div>
+        <article class="card panel" style="margin-top:16px">
+          <div class="panel-head"><div><div class="panel-title">Recently added employees</div><div class="panel-note">Your growing team</div></div><button class="text-button" onclick="navigate('employees')">Employee directory →</button></div>
+          <div id="recent-employees"></div>
+        </article>
+      </section>
+      <section id="view-employees" class="section">
+        <h1>Employee directory</h1><p class="subtitle">Manage employee profiles and contact details.</p>
+        <article class="card panel"><div class="toolbar"><input id="employee-search" class="search" placeholder="Search name, ID, or department..." oninput="renderEmployees()"><button class="primary" onclick="openEmployee()">＋ Add employee</button></div><div id="employee-table" class="table-wrap"></div></article>
+      </section>
+      <section id="view-attendance" class="section">
+        <h1>Attendance</h1><p class="subtitle">Record and review daily team attendance.</p>
+        <article class="card panel"><div class="toolbar"><input id="attendance-date" type="date" class="search" onchange="renderAttendance()"><button class="primary" onclick="openAttendance()">＋ Mark attendance</button></div><div id="attendance-table" class="table-wrap"></div></article>
+      </section>
+      <section id="view-leaves" class="section">
+        <h1>Leave requests</h1><p class="subtitle">Review time-off requests and keep your team moving.</p>
+        <article class="card panel"><div class="toolbar"><select id="leave-filter" class="search" onchange="renderLeaves()"><option value="ALL">All requests</option><option value="PENDING">Pending</option><option value="APPROVED">Approved</option><option value="REJECTED">Rejected</option></select><button class="primary" onclick="openLeave()">＋ New request</button></div><div id="leave-table" class="table-wrap"></div></article>
+      </section>
+    </main>
+  </div>
+  <div id="login-screen" class="login-screen">
+    <form id="login-form" class="card login-card">
+      <div class="brand" style="padding:0"><span class="brand-mark">P</span><span>People<span>OS</span></span></div>
+      <h1>Welcome back</h1><p>Sign in with your HR administrator account to open your people dashboard.</p>
+      <div class="field"><label for="login-username">USERNAME</label><input id="login-username" autocomplete="username" required></div>
+      <div class="field"><label for="login-password">PASSWORD</label><input id="login-password" type="password" autocomplete="current-password" required></div>
+      <div id="login-error" class="error"></div><button class="primary" type="submit">Sign in to dashboard</button>
+    </form>
+  </div>
+  <div id="modal-backdrop" class="modal-backdrop" onclick="backdropClose(event)"><div id="modal" class="modal"></div></div>
+  <div id="toast" class="toast"></div>
+  <script>
+    const state = { data: null, view: "overview" };
+    const localNow = new Date();
+    const today = `${localNow.getFullYear()}-${String(localNow.getMonth() + 1).padStart(2, "0")}-${String(localNow.getDate()).padStart(2, "0")}`;
+    document.getElementById("attendance-date").value = today;
+    document.getElementById("date-pill").textContent = new Intl.DateTimeFormat(undefined, { weekday: "short", month: "short", day: "numeric", year: "numeric" }).format(new Date());
+
+    async function api(path, options = {}) {
+      const response = await fetch(path, { credentials: "same-origin", ...options });
+      const payload = await response.json();
+      if (!response.ok) {
+        if (response.status === 401 && path !== "/api/login") showLogin();
+        throw new Error(payload.error || "The request could not be completed.");
+      }
+      return payload;
+    }
+    function formBody(values) { return new URLSearchParams(values).toString(); }
+    function options(method, values) { return { method, headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" }, body: formBody(values) }; }
+    async function refresh() {
+      state.data = await api("/api/data");
+      document.getElementById("username").textContent = state.data.username;
+      document.getElementById("welcome-name").textContent = state.data.username;
+      document.getElementById("avatar").textContent = state.data.username.slice(0, 2).toUpperCase();
+      document.getElementById("stat-employees").textContent = state.data.employeeCount;
+      document.getElementById("stat-departments").textContent = state.data.departmentCount;
+      document.getElementById("stat-present").textContent = state.data.present;
+      document.getElementById("stat-pending").textContent = state.data.pendingCount;
+      document.getElementById("stat-present-note").textContent = `${state.data.absent} absent · ${state.data.onLeave} on leave`;
+      document.getElementById("not-marked").textContent = `${state.data.notMarked} not marked`;
+      renderChart(); renderOverviewLeaves(); renderRecentEmployees();
+      renderEmployees(); renderAttendance(); renderLeaves();
+    }
+    function showLogin(message = "") {
+      document.getElementById("app").hidden = true;
+      document.getElementById("login-screen").style.display = "flex";
+      document.getElementById("login-error").textContent = message;
+    }
+    function showApp() {
+      document.getElementById("login-screen").style.display = "none";
+      document.getElementById("app").hidden = false;
+    }
+    document.getElementById("login-form").addEventListener("submit", async event => {
+      event.preventDefault();
+      const button = event.currentTarget.querySelector("button");
+      button.disabled = true; button.textContent = "Signing in…";
+      try {
+        await api("/api/login", options("POST", {
+          username: document.getElementById("login-username").value,
+          password: document.getElementById("login-password").value
+        }));
+        document.getElementById("login-password").value = "";
+        showApp(); await refresh();
+      } catch (error) { document.getElementById("login-error").textContent = error.message; }
+      finally { button.disabled = false; button.textContent = "Sign in to dashboard"; }
+    });
+    async function boot() {
+      try {
+        const session = await api("/api/session");
+        if (!session.authenticated) { showLogin(); return; }
+        await refresh(); showApp();
+      }
+      catch { showLogin(); }
+    }
+    async function logout() {
+      try { await api("/api/logout", { method: "POST" }); }
+      finally { showLogin(); }
+    }
+    function navigate(view) {
+      state.view = view;
+      document.querySelectorAll(".section").forEach(section => section.classList.remove("active"));
+      document.getElementById(`view-${view}`).classList.add("active");
+      document.querySelectorAll(".nav button").forEach(button => button.classList.toggle("active", button.dataset.view === view));
+      document.getElementById("breadcrumb").textContent = ({ overview: "Overview", employees: "Employees", attendance: "Attendance", leaves: "Leave requests" })[view];
+      document.getElementById("top-add").style.display = view === "employees" ? "none" : "";
+      document.getElementById("top-add").onclick = view === "attendance" ? openAttendance : view === "leaves" ? openLeave : openEmployee;
+      document.getElementById("top-add").textContent = view === "attendance" ? "＋ Mark attendance" : view === "leaves" ? "＋ New request" : "＋ Add employee";
+      document.getElementById("sidebar").classList.remove("open");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+    document.querySelectorAll(".nav button").forEach(button => button.addEventListener("click", () => navigate(button.dataset.view)));
+    function toggleMenu() { document.getElementById("sidebar").classList.toggle("open"); }
+    function renderChart() {
+      const values = [{ label: "Present", value: state.data.present }, { label: "Absent", value: state.data.absent }, { label: "On leave", value: state.data.onLeave }];
+      const max = Math.max(1, ...values.map(item => item.value));
+      document.getElementById("attendance-chart").innerHTML = values.map(item => `<div class="bar-group"><div class="bar" style="height:${Math.max(4, item.value / max * 128)}px" title="${item.value} ${item.label.toLowerCase()}"></div><div class="bar-label">${item.label} · ${item.value}</div></div>`).join("");
+    }
+    function renderOverviewLeaves() {
+      const pending = state.data.leaves.filter(item => item.status === "PENDING").slice(0, 4);
+      document.getElementById("overview-leaves").innerHTML = pending.length ? pending.map(item => `<div class="activity"><div class="activity-mark">${esc(initials(item.employeeName))}</div><div class="activity-main"><div class="activity-name">${esc(item.employeeName)}</div><div class="activity-detail">${esc(item.type)} · ${esc(item.startDate)} – ${esc(item.endDate)}</div></div><span class="badge PENDING">PENDING</span></div>`).join("") : `<div class="empty">All caught up! No leave requests need review.</div>`;
+    }
+    function renderRecentEmployees() {
+      const rows = [...state.data.employees].slice(-5).reverse();
+      document.getElementById("recent-employees").innerHTML = employeeRows(rows);
+    }
+    function renderEmployees() {
+      if (!state.data) return;
+      const query = (document.getElementById("employee-search").value || "").trim().toLowerCase();
+      const rows = state.data.employees.filter(item => `${item.id} ${item.name} ${item.department} ${item.designation}`.toLowerCase().includes(query));
+      document.getElementById("employee-table").innerHTML = employeeRows(rows, true);
+    }
+    function employeeRows(rows, actions = false) {
+      if (!rows.length) return `<div class="empty">No employees to display yet. Add an employee to get started.</div>`;
+      return `<table><thead><tr><th>Employee</th><th>Employee ID</th><th>Department</th><th>Designation</th><th>Contact</th>${actions ? "<th>Actions</th>" : ""}</tr></thead><tbody>${rows.map(item => `<tr><td><div class="person"><span class="mini-avatar">${esc(initials(item.name))}</span>${esc(item.name)}</div></td><td>${esc(item.id)}</td><td>${esc(item.department)}</td><td>${esc(item.designation)}</td><td>${esc(item.contact)}</td>${actions ? `<td><div class="row-actions"><button class="small-btn" onclick="editEmployee('${attr(item.id)}')">Edit</button><button class="small-btn danger" onclick="deleteEmployee('${attr(item.id)}')">Delete</button></div></td>` : ""}</tr>`).join("")}</tbody></table>`;
+    }
+    function renderAttendance() {
+      if (!state.data) return;
+      const date = document.getElementById("attendance-date").value || today;
+      const rows = state.data.attendance.filter(item => item.date === date);
+      document.getElementById("attendance-table").innerHTML = rows.length ? `<table><thead><tr><th>Employee</th><th>Employee ID</th><th>Date</th><th>Status</th></tr></thead><tbody>${rows.map(item => {
+        const employee = state.data.employees.find(person => person.id.toLowerCase() === item.employeeId.toLowerCase());
+        return `<tr><td>${esc(employee ? employee.name : "Unknown employee")}</td><td>${esc(item.employeeId)}</td><td>${esc(item.date)}</td><td><span class="badge ${attr(item.status)}">${esc(item.status.replace("_", " "))}</span></td></tr>`;
+      }).join("")}</tbody></table>` : `<div class="empty">No attendance recorded for ${esc(date)}.</div>`;
+    }
+    function renderLeaves() {
+      if (!state.data) return;
+      const filter = document.getElementById("leave-filter").value;
+      const rows = state.data.leaves.filter(item => filter === "ALL" || item.status === filter);
+      document.getElementById("leave-table").innerHTML = rows.length ? `<table><thead><tr><th>Employee</th><th>Leave type</th><th>Dates</th><th>Status</th><th>Actions</th></tr></thead><tbody>${rows.map(item => `<tr><td><div class="person">${esc(item.employeeName)} <span style="color:#a0a1b1;font-weight:400">${esc(item.employeeId)}</span></div></td><td>${esc(item.type)}</td><td>${esc(item.startDate)} – ${esc(item.endDate)}</td><td><span class="badge ${attr(item.status)}">${esc(item.status)}</span></td><td>${item.status === "PENDING" ? `<div class="row-actions"><button class="small-btn" onclick="decideLeave(${item.id},'APPROVED')">Approve</button><button class="small-btn danger" onclick="decideLeave(${item.id},'REJECTED')">Reject</button></div>` : "—"}</td></tr>`).join("")}</tbody></table>` : `<div class="empty">No leave requests match this filter.</div>`;
+    }
+    function openModal(title, hint, content, onSubmit) {
+      const modal = document.getElementById("modal");
+      modal.innerHTML = `<h2>${title}</h2><p class="hint">${hint}</p><form id="modal-form">${content}<div class="modal-actions"><button class="secondary" type="button" onclick="closeModal()">Cancel</button><button class="primary" type="submit">Save changes</button></div></form>`;
+      document.getElementById("modal-backdrop").classList.add("open");
+      document.getElementById("modal-form").addEventListener("submit", async event => {
+        event.preventDefault();
+        const form = Object.fromEntries(new FormData(event.currentTarget).entries());
+        try { await onSubmit(form); closeModal(); await refresh(); toast("Changes saved successfully."); }
+        catch (error) { toast(error.message); }
+      });
+    }
+    function field(label, name, value = "", type = "text", required = true, full = false) {
+      return `<div class="field ${full ? "full" : ""}"><label>${label.toUpperCase()}</label><input name="${name}" type="${type}" value="${attr(value)}" ${required ? "required" : ""}></div>`;
+    }
+    function openEmployee(employee = null) {
+      const editing = employee !== null;
+      openModal(editing ? "Update employee" : "Add an employee", editing ? "Update the employee profile details." : "Add someone new to your organization.", `<div class="form-grid">${field("Employee ID", "id", editing ? employee.id : "", "text", true, true)}${field("Full name", "name", editing ? employee.name : "")}${field("Designation", "designation", editing ? employee.designation : "")}${field("Department", "department", editing ? employee.department : "")}${field("Contact information", "contact", editing ? employee.contact : "", "text", true, true)}</div>`, async form => {
+        if (editing) { delete form.id; await api(`/api/employees/${encodeURIComponent(employee.id)}`, options("PUT", form)); }
+        else await api("/api/employees", options("POST", form));
+      });
+    }
+    function editEmployee(id) { const employee = state.data.employees.find(item => item.id === id); if (employee) openEmployee(employee); }
+    async function deleteEmployee(id) {
+      const employee = state.data.employees.find(item => item.id === id);
+      if (!employee || !confirm(`Delete ${employee.name} and all their attendance and leave records?`)) return;
+      try { await api(`/api/employees/${encodeURIComponent(id)}`, { method: "DELETE" }); await refresh(); toast("Employee deleted."); }
+      catch (error) { toast(error.message); }
+    }
+    function openAttendance() {
+      const people = state.data.employees;
+      if (!people.length) { toast("Add an employee before marking attendance."); return; }
+      openModal("Mark attendance", "Choose an employee, date, and attendance status.", `<div class="field"><label>EMPLOYEE</label><select name="employeeId" required>${people.map(item => `<option value="${attr(item.id)}">${esc(item.name)} · ${esc(item.id)}</option>`).join("")}</select></div><div class="form-grid">${field("Date", "date", today, "date")}</div><div class="field"><label>STATUS</label><select name="status"><option value="PRESENT">Present</option><option value="ABSENT">Absent</option><option value="ON_LEAVE">On leave</option></select></div>`, form => api("/api/attendance", options("POST", form)));
+    }
+    function openLeave() {
+      const people = state.data.employees;
+      if (!people.length) { toast("Add an employee before creating a leave request."); return; }
+      openModal("New leave request", "Create a request for an employee. It will start as pending.", `<div class="field"><label>EMPLOYEE</label><select name="employeeId" required>${people.map(item => `<option value="${attr(item.id)}">${esc(item.name)} · ${esc(item.id)}</option>`).join("")}</select></div><div class="field"><label>LEAVE TYPE</label><select name="type"><option>Annual</option><option>Sick</option><option>Personal</option><option>Unpaid</option></select></div><div class="form-grid">${field("Start date", "startDate", today, "date")}${field("End date", "endDate", today, "date")}</div>`, form => api("/api/leaves", options("POST", form)));
+    }
+    async function decideLeave(id, status) {
+      try { await api("/api/leaves", options("PATCH", { id, status })); await refresh(); toast(`Leave request ${status.toLowerCase()}.`); }
+      catch (error) { toast(error.message); }
+    }
+    function closeModal() { document.getElementById("modal-backdrop").classList.remove("open"); }
+    function backdropClose(event) { if (event.target.id === "modal-backdrop") closeModal(); }
+    let toastTimer;
+    function toast(message) {
+      const element = document.getElementById("toast"); element.textContent = message; element.classList.add("show");
+      clearTimeout(toastTimer); toastTimer = setTimeout(() => element.classList.remove("show"), 2800);
+    }
+    function initials(name) { return name.trim().split(/\s+/).slice(0, 2).map(part => part[0] || "").join("").toUpperCase(); }
+    function esc(value) { return String(value ?? "").replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]); }
+    function attr(value) { return esc(value); }
+    boot();
+  </script>
+</body>
+</html>
