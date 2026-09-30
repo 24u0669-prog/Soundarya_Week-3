@@ -76,7 +76,7 @@ pom.xml                  Java 25 Maven build configuration
 hrms-data.txt            Local application data (created on first run)
 ```
 ## Dashboard Screenshots
-<img width="1570" height="645" alt="image" src="https://github.com/user-attachments/assets/cf43a5f6-c09e-40e2-8e75-1f3057ef7fd6" />
+<img width="507" height="575" alt="Screenshot 2026-09-30 170919" src="https://github.com/user-attachments/assets/10029cdc-011b-4ec7-a88a-bda07393d6bd" />
 
 
 ## Author
