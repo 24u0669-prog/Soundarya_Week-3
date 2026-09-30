@@ -76,7 +76,14 @@ pom.xml                  Java 25 Maven build configuration
 hrms-data.txt            Local application data (created on first run)
 ```
 ## Dashboard Screenshots
-<img width="507" height="575" alt="Screenshot 2026-09-30 170919" src="https://github.com/user-attachments/assets/10029cdc-011b-4ec7-a88a-bda07393d6bd" />
+<img width="507" height="575" alt="Screenshot 2026-09-30 170919" src="https://github.com/user-attachments/assets/9f3345cd-5338-4e5a-9db9-0414fd90d590" />
+<img width="1896" height="911" alt="Screenshot 2026-09-30 171743" src="https://github.com/user-attachments/assets/15b7b95b-d67b-46d4-8955-296b75f0da73" />
+<img width="1882" height="917" alt="Screenshot 2026-09-30 171843" src="https://github.com/user-attachments/assets/2ecb0bac-b09b-4498-8239-d82df293260b" />
+<img width="1872" height="912" alt="Screenshot 2026-09-30 171942" src="https://github.com/user-attachments/assets/a4aff2ba-d39b-4b70-83fe-2d245a5cf65d" />
+<img width="1855" height="897" alt="Screenshot 2026-09-30 172036" src="https://github.com/user-attachments/assets/78c63bc0-4047-437f-86c3-0e3e0cf4d693" />
+<img width="1860" height="812" alt="Screenshot 2026-09-30 172127" src="https://github.com/user-attachments/assets/e8457726-0e40-48f3-afe6-755476aa434b" />
+<img width="1512" height="637" alt="Screenshot 2026-09-30 172240" src="https://github.com/user-attachments/assets/bfecd67a-c857-45d8-8317-0f0e88ea4830" />
+<img width="1570" height="645" alt="Screenshot 2026-09-30 172342" src="https://github.com/user-attachments/assets/cd152642-189e-46a9-bb11-2832ca06754f" />
 
 
 ## Author
