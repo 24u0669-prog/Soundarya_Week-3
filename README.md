@@ -1,50 +1,85 @@
-# HRMS
+# Human Resource Management System (HRMS)
 
-A Java 17+ HR management project. Its interactive browser dashboard is served by
-Java's built-in `HttpServer`; the HRMS backend uses core Java and saves data locally
-in `hrms-data.txt` in the current working directory. The dashboard supports employee
-management, attendance, leave requests, and live summary cards without external
-libraries or a framework.
+A lightweight, browser-based human resource management system built with Java 17
+and the JDK's built-in `HttpServer`. HRMS provides a simple way to manage employee
+records, track attendance, and review leave requests through a responsive dashboard.
+Application data is stored locally in `hrms-data.txt`; no external libraries or
+frameworks are required.
 
-## Start the web dashboard
+## Features
 
-Open a terminal in the project folder. On the first run, create an administrator
-account when prompted. Then the app starts its local web server and opens the
-dashboard in your browser; otherwise open `http://localhost:8080`.
+- Create, view, update, delete, and search employee records.
+- Record and review daily attendance, including present, absent, and on-leave statuses.
+- Submit leave requests and approve or reject pending requests.
+- Generate employee, attendance date-range, and leave-status reports.
+- View live attendance and leave summaries on the interactive dashboard.
+- Preserve records between runs using local file storage.
+- Protect access with administrator authentication.
+- Bind the web server to the local machine only.
+
+## Requirements
+
+- Java Development Kit (JDK) 17 or later
+- A modern web browser
+
+## Getting started
+
+Open a terminal in the project directory and compile the application:
 
 ```powershell
 javac -d out src\main\java\hrms\Main.java src\main\java\hrms\WebDashboard.java
+```
+
+Start HRMS:
+
+```powershell
 java -cp out hrms.Main
 ```
 
-Keep the terminal open while using the dashboard. Press **Ctrl+C** in that terminal
-to stop the local server. If port 8080 is already in use, choose another port:
+On the first run, follow the prompt to create an administrator account. The
+dashboard opens in your browser. If it does not, navigate to
+`http://localhost:8080`.
+
+Keep the terminal open while using the dashboard. Press **Ctrl+C** in the
+terminal to stop the server.
+
+## Configuration
+
+If port `8080` is already in use, start the application on another port:
 
 ```powershell
 java -Dhrms.port=8081 -cp out hrms.Main
 ```
 
-The HTML, styling, and browser interactions live in
-`src/main/resources/hrms/dashboard.html`. They use browser-native HTML, CSS, and
-JavaScript; no packages, CDNs, or UI frameworks are required.
-
-To store HRMS data at a different path:
+To save application data at a different location:
 
 ```powershell
 java -Dhrms.data="C:\path\to\hrms-data.txt" -cp out hrms.Main
 ```
 
-For the original console menu, run `java -cp out hrms.Main --console`.
+To use the original console menu instead of the web dashboard:
 
-## Features
+```powershell
+java -cp out hrms.Main --console
+```
 
-- Add, view, update, delete, and search employee records.
-- Record and review daily present, absent, and on-leave attendance.
-- Create leave requests and approve or reject pending requests.
-- Generate employee, attendance date-range, and leave status reports.
-- Browse an interactive, responsive dashboard with live attendance and leave summaries.
-- Persist records between runs and require administrator authentication.
-- Bind the built-in HTTP server to the local machine only.
+## Project structure
 
-Passwords are stored as salted PBKDF2-HMAC-SHA256 hashes. The server is intended for
-local project demonstrations, not deployment to a public network.
+- `src/main/java/hrms/Main.java` — application entry point and HRMS operations.
+- `src/main/java/hrms/WebDashboard.java` — local HTTP server and dashboard integration.
+- `src/main/resources/hrms/dashboard.html` — dashboard markup, styles, and browser interactions.
+- `hrms-data.txt` — local application data, created or updated when the application runs.
+
+The dashboard uses browser-native HTML, CSS, and JavaScript. It does not load
+third-party packages, CDNs, or UI frameworks.
+
+## Security and deployment
+
+Administrator passwords are stored as salted PBKDF2-HMAC-SHA256 hashes. The
+built-in server listens on the local machine and this project is intended for
+local demonstrations, not public-network deployment.
+
+## Author
+
+**Soundarya*
+Information Science Engineering Student 
